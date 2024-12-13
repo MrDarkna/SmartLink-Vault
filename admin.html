@@ -1,0 +1,1510 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Intelligent Search Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Modern font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Basic Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ece9e6, #ffffff);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            transition: background 0.5s ease, color 0.5s ease;
+            position: relative;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            color: #f5f6fa;
+        }
+
+        .container {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            max-width: 1000px;
+            width: 100%;
+            overflow-x: auto;
+            transition: background 0.5s ease, color 0.5s ease;
+            position: relative;
+        }
+
+        body.dark-mode .container {
+            background: #34495e;
+            color: #ecf0f1;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.5);
+        }
+
+        .container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #6C63FF;
+        }
+
+        body.dark-mode .container h1 {
+            color: #a29bfe;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .section h2 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            color: #333;
+            border-bottom: 2px solid #6C63FF;
+            display: inline-block;
+            padding-bottom: 5px;
+            transition: color 0.5s ease;
+        }
+
+        body.dark-mode .section h2 {
+            color: #dfe6e9;
+            border-bottom: 2px solid #a29bfe;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input[type="text"], input[type="url"], select, textarea {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #6C63FF;
+            box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+            outline: none;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #6C63FF, #5A54FF);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            align-self: flex-start;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #5A54FF, #483DFF);
+            transform: translateY(-2px);
+        }
+
+        .bulk-action {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .bulk-action label {
+            margin-right: 5px;
+            flex-shrink: 0;
+        }
+
+        .category-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            user-select: none;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #ccc;
+            transition: background 0.3s ease;
+            position: relative;
+        }
+
+        .category-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .category-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .category-item.selected {
+            background-color: #d0e1ff;
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .theme-toggle input[type="checkbox"] {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        /* Help Icon Style */
+        .help-icon {
+            display: inline-block;
+            margin-left: 5px;
+            color: #6C63FF;
+            font-weight: bold;
+            cursor: help;
+        }
+
+        /* Table Container for Horizontal Scrolling */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            table-layout: fixed;
+            word-wrap: break-word;
+            user-select: none;
+            position: relative;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        th:nth-child(1), td:nth-child(1) {
+            width: 5%;
+        }
+
+        th:nth-child(2), td:nth-child(2) {
+            width: 30%;
+        }
+
+        th:nth-child(3), td:nth-child(3) {
+            width: 20%;
+        }
+
+        th:nth-child(4), td:nth-child(4) {
+            width: 25%;
+        }
+
+        th:nth-child(5), td:nth-child(5) {
+            width: 10%;
+        }
+
+        th:nth-child(6), td:nth-child(6) {
+            width: 10%;
+        }
+
+        th {
+            background: linear-gradient(135deg, #6C63FF, #5A54FF);
+            color: #fff;
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .action-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            transition: background 0.3s ease;
+            min-width: 60px;
+        }
+
+        .edit-btn {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .edit-btn:hover {
+            background: #e0a800;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        /* Resizer Style */
+        .resizer {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 5px;
+            cursor: col-resize;
+            user-select: none;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Drag selection overlay */
+        .selection-overlay {
+            position: absolute;
+            border: 2px dashed #6C63FF;
+            background: rgba(108, 99, 255, 0.1);
+            pointer-events: none;
+            display: none;
+        }
+
+        .selection-overlay-links {
+            position: absolute;
+            border: 2px dashed #6C63FF;
+            background: rgba(108, 99, 255, 0.1);
+            pointer-events: none;
+            display: none;
+        }
+
+        /* Selected link row styling */
+        .link-row.selected {
+            background-color: #d0e1ff;
+        }
+
+        /* Backup & Restore Section Styles */
+        .backup-restore {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .backup-restore h2 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            color: #333;
+            border-bottom: 2px solid #6C63FF;
+            display: inline-block;
+            padding-bottom: 5px;
+            transition: color 0.5s ease;
+        }
+
+        body.dark-mode .backup-restore h2 {
+            color: #dfe6e9;
+            border-bottom: 2px solid #a29bfe;
+        }
+
+        .backup-restore button {
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        /* Hide the file input */
+        #import-file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Admin Panel</h1>
+
+    <!-- Theme Toggle Section -->
+    <div class="section" id="theme-toggle-section">
+        <h2>Theme Settings</h2>
+        <div class="theme-toggle">
+            <input type="checkbox" id="theme-toggle-checkbox">
+            <label for="theme-toggle-checkbox">Enable Dark Mode</label>
+        </div>
+    </div>
+
+    <!-- Template Settings Section -->
+    <div class="section" id="template-settings">
+        <h2>Template Settings</h2>
+        <form id="settings-form">
+            <label for="category-position">Category Bar Position:</label>
+            <select id="category-position" name="category-position">
+                <option value="horizontal">Horizontal (Below Search Bar)</option>
+                <option value="vertical-left">Vertical (Left Side)</option>
+                <option value="vertical-right">Vertical (Right Side)</option>
+            </select>
+
+            <button type="submit">Save Settings</button>
+        </form>
+    </div>
+
+    <!-- Category Management Section -->
+    <div class="section" id="category-management">
+        <h2>Category Management</h2>
+        <form id="category-form">
+            <label for="new-category">Add New Category:</label>
+            <input type="text" id="new-category" name="new-category" placeholder="Enter category name" required>
+            <button type="submit">Add Category</button>
+        </form>
+
+        <button id="delete-selected-categories-btn" style="display:none;background:#dc3545;">Delete Selected Categories</button>
+
+        <ul class="category-list" id="category-list"></ul>
+        <div class="selection-overlay" id="selection-overlay"></div>
+    </div>
+
+    <!-- Link Management Section -->
+    <div class="section" id="link-management">
+        <h2>Link Management</h2>
+        <form id="link-form">
+            <label for="link-url">URL:</label>
+            <input type="url" id="link-url" name="link-url" placeholder="https://example.com" required>
+
+            <label for="link-text">Display Text:</label>
+            <input type="text" id="link-text" name="link-text" placeholder="Example Site" required>
+
+            <label for="link-categories">Categories (Select multiple with Ctrl/Cmd):</label>
+            <select id="link-categories" name="link-categories" multiple required></select>
+
+            <button type="submit">Add Link</button>
+        </form>
+
+        <!-- Bulk Category Assignment -->
+        <div class="bulk-action">
+            <label for="bulk-categories">Assign Categories to Selected Links:</label>
+            <select id="bulk-categories" name="bulk-categories" multiple required></select>
+            <button id="assign-categories-btn">Assign Categories</button>
+        </div>
+
+        <!-- Bulk Category Removal -->
+        <div class="bulk-action" style="margin-top:10px;">
+            <label for="remove-categories">Remove Categories from Selected Links:</label>
+            <select id="remove-categories" name="remove-categories" multiple required></select>
+            <button id="remove-categories-btn" style="background:#e67e22;">Remove Categories</button>
+        </div>
+
+        <div style="margin-top: 15px; display:flex; gap:10px; align-items:center;">
+            <button id="intelligent-assignment-btn" style="background: #6C63FF; color: #fff;">
+                Intelligent Category Assignment
+            </button>
+            <span class="help-icon" title="This feature first assigns categories if the link's title contains the category name. Then it looks for patterns with at least 7 instances of a word→category match. If found, it assigns that category to links without previously assigned categories based on those patterns.">?</span>
+
+            <button id="delete-selected-links-btn" style="background:#dc3545;display:none;">Delete Selected Links</button>
+        </div>
+
+        <!-- Table Container for Horizontal Scrolling -->
+        <div class="table-container">
+            <table id="links-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all"></th>
+                        <th>URL<div class="resizer"></div></th>
+                        <th>Display Text<div class="resizer"></div></th>
+                        <th>Categories<div class="resizer"></div></th>
+                        <th>Edit<div class="resizer"></div></th>
+                        <th>Delete<div class="resizer"></div></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="selection-overlay-links" id="selection-overlay-links"></div>
+    </div>
+
+    <!-- Batch Link Addition Section -->
+    <div class="section" id="batch-link-addition">
+        <h2>Batch Link Addition</h2>
+        <form id="batch-link-form">
+            <label for="batch-links">Paste Links Here (Format: URL, Display Text on each line):</label>
+            <textarea id="batch-links" name="batch-links" placeholder="https://example.com, Example Site\nhttps://test.com, Test Site"></textarea>
+            <button type="submit">Add Batch Links</button>
+        </form>
+    </div>
+
+    <!-- Backup & Restore Section -->
+    <div class="section backup-restore" id="backup-restore-section">
+        <h2>Backup & Restore</h2>
+        <button id="export-btn">Export Data</button>
+        <button id="import-btn">Import Data</button>
+        <input type="file" id="import-file-input" accept=".json">
+    </div>
+
+</div>
+
+<script>
+    // Utility Functions
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;");
+    }
+
+    // Theme Toggle
+    const themeToggleCheckbox = document.getElementById('theme-toggle-checkbox');
+
+    function loadTheme() {
+        const theme = localStorage.getItem('theme') || 'default';
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggleCheckbox.checked = true;
+        } else {
+            document.body.classList.remove('dark-mode');
+            themeToggleCheckbox.checked = false;
+        }
+    }
+
+    function saveTheme(theme) {
+        localStorage.setItem('theme', theme);
+    }
+
+    themeToggleCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            document.body.classList.add('dark-mode');
+            saveTheme('dark');
+        } else {
+            document.body.classList.remove('dark-mode');
+            saveTheme('default');
+        }
+    });
+
+    loadTheme();
+
+    // Template Settings
+    const settingsForm = document.getElementById('settings-form');
+    const categoryPositionSelect = document.getElementById('category-position');
+
+    function loadSettings() {
+        const settings = JSON.parse(localStorage.getItem('templateSettings')) || { categoryPosition: 'horizontal' };
+        categoryPositionSelect.value = settings.categoryPosition;
+    }
+
+    function saveSettings(position) {
+        const settings = { categoryPosition: position };
+        localStorage.setItem('templateSettings', JSON.stringify(settings));
+        alert('Template settings saved successfully!');
+    }
+
+    settingsForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const position = categoryPositionSelect.value;
+        saveSettings(position);
+    });
+
+    loadSettings();
+
+    // Category Management
+    const categoryForm = document.getElementById('category-form');
+    const categoryList = document.getElementById('category-list');
+    const linkCategoriesSelect = document.getElementById('link-categories');
+    const bulkCategoriesSelect = document.getElementById('bulk-categories');
+    const removeCategoriesSelect = document.getElementById('remove-categories');
+    const deleteSelectedCategoriesBtn = document.getElementById('delete-selected-categories-btn');
+    const selectionOverlay = document.getElementById('selection-overlay');
+    let lastClickedCategoryIndex = null;
+    let isSelectingCategories = false;
+    let catStartX, catStartY;
+
+    function loadCategories() {
+        const categories = JSON.parse(localStorage.getItem('categories')) || [];
+        categoryList.innerHTML = '';
+        linkCategoriesSelect.innerHTML = '';
+        bulkCategoriesSelect.innerHTML = '';
+        removeCategoriesSelect.innerHTML = '';
+
+        categories.forEach((category, index) => {
+            const li = document.createElement('li');
+            li.classList.add('category-item');
+
+            li.innerHTML = `
+                <input type="checkbox" class="cat-checkbox" data-index="${index}">
+                <span>${escapeHTML(category)}</span>
+                <div class="category-actions" style="margin-left:auto;">
+                    <button class="action-btn edit-category-btn" data-index="${index}">Edit</button>
+                    <button class="action-btn delete-category-btn" data-index="${index}">Delete</button>
+                </div>
+            `;
+            categoryList.appendChild(li);
+
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            linkCategoriesSelect.appendChild(option);
+
+            const bulkOption = document.createElement('option');
+            bulkOption.value = category;
+            bulkOption.textContent = category;
+            bulkCategoriesSelect.appendChild(bulkOption);
+
+            const removeOption = document.createElement('option');
+            removeOption.value = category;
+            removeOption.textContent = category;
+            removeCategoriesSelect.appendChild(removeOption);
+        });
+
+        updateDeleteCategoriesBtn();
+    }
+
+    function saveCategories(categories) {
+        localStorage.setItem('categories', JSON.stringify(categories));
+        loadCategories();
+    }
+
+    categoryForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newCategoryInput = document.getElementById('new-category');
+        const newCategory = newCategoryInput.value.trim();
+
+        if (!newCategory) {
+            alert('Please enter a category name.');
+            return;
+        }
+
+        let categories = JSON.parse(localStorage.getItem('categories')) || [];
+
+        if (categories.includes(newCategory)) {
+            alert('Category already exists.');
+            return;
+        }
+
+        categories.push(newCategory);
+        saveCategories(categories);
+        newCategoryInput.value = '';
+        alert('Category added successfully!');
+    });
+
+    categoryList.addEventListener('click', function(e) {
+        let categories = JSON.parse(localStorage.getItem('categories')) || [];
+        if (e.target.classList.contains('delete-category-btn')) {
+            const index = e.target.getAttribute('data-index');
+            const categoryToDelete = categories[index];
+            categories.splice(index, 1);
+            saveCategories(categories);
+
+            let storedLinks = getLinks();
+            storedLinks.forEach(link => {
+                link.categories = link.categories.filter(cat => cat !== categoryToDelete);
+            });
+            saveLinksArray(storedLinks);
+            loadLinks();
+            alert('Category deleted successfully!');
+        }
+
+        if (e.target.classList.contains('edit-category-btn')) {
+            const index = e.target.getAttribute('data-index');
+            const currentCategory = categories[index];
+            const newCategory = prompt('Enter new category name:', currentCategory);
+            if (newCategory === null) return;
+
+            const trimmedCategory = newCategory.trim();
+
+            if (!trimmedCategory) {
+                alert('Category name cannot be empty.');
+                return;
+            }
+
+            if (categories.includes(trimmedCategory) && trimmedCategory !== currentCategory) {
+                alert('Category already exists.');
+                return;
+            }
+
+            categories[index] = trimmedCategory;
+            saveCategories(categories);
+
+            let storedLinks = getLinks();
+            storedLinks.forEach(link => {
+                link.categories = link.categories.map(cat => cat === currentCategory ? trimmedCategory : cat);
+            });
+            saveLinksArray(storedLinks);
+            loadLinks();
+            alert('Category updated successfully!');
+        }
+
+        updateDeleteCategoriesBtn();
+    });
+
+    // Handle shift/ctrl selection for categories
+    categoryList.addEventListener('click', function(e) {
+        if (e.target.classList.contains('cat-checkbox')) {
+            const checkboxes = categoryList.querySelectorAll('.cat-checkbox');
+            const clickedIndex = parseInt(e.target.getAttribute('data-index'));
+
+            if (e.shiftKey && lastClickedCategoryIndex !== null) {
+                const start = Math.min(lastClickedCategoryIndex, clickedIndex);
+                const end = Math.max(lastClickedCategoryIndex, clickedIndex);
+                for (let i = start; i <= end; i++) {
+                    checkboxes[i].checked = true;
+                }
+            }
+
+            lastClickedCategoryIndex = clickedIndex;
+            updateDeleteCategoriesBtn();
+        }
+    });
+
+    // Drag selection for categories
+    categoryList.addEventListener('mousedown', function(e) {
+        if (e.target.classList.contains('cat-checkbox') || e.target.classList.contains('edit-category-btn') || e.target.classList.contains('delete-category-btn')) {
+            return;
+        }
+        isSelectingCategories = true;
+        catStartX = e.clientX;
+        catStartY = e.clientY;
+        selectionOverlay.style.display = 'block';
+        selectionOverlay.style.left = catStartX + 'px';
+        selectionOverlay.style.top = catStartY + 'px';
+        selectionOverlay.style.width = '0px';
+        selectionOverlay.style.height = '0px';
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (isSelectingCategories) {
+            const x = Math.min(e.clientX, catStartX);
+            const y = Math.min(e.clientY, catStartY);
+            const w = Math.abs(e.clientX - catStartX);
+            const h = Math.abs(e.clientY - catStartY);
+            selectionOverlay.style.left = x + 'px';
+            selectionOverlay.style.top = y + 'px';
+            selectionOverlay.style.width = w + 'px';
+            selectionOverlay.style.height = h + 'px';
+
+            const rect = selectionOverlay.getBoundingClientRect();
+            const items = categoryList.querySelectorAll('.category-item');
+            items.forEach(item => {
+                const itemRect = item.getBoundingClientRect();
+                const inside = !(itemRect.right < rect.left || itemRect.left > rect.right || itemRect.bottom < rect.top || itemRect.top > rect.bottom);
+                item.classList.toggle('selected', inside);
+            });
+        }
+    });
+
+    document.addEventListener('mouseup', function(e) {
+        if (isSelectingCategories) {
+            isSelectingCategories = false;
+            selectionOverlay.style.display = 'none';
+
+            const items = categoryList.querySelectorAll('.category-item');
+            items.forEach(item => {
+                const checkbox = item.querySelector('.cat-checkbox');
+                if (item.classList.contains('selected')) {
+                    checkbox.checked = true;
+                    item.classList.remove('selected');
+                }
+            });
+            updateDeleteCategoriesBtn();
+        }
+    });
+
+    function updateDeleteCategoriesBtn() {
+        const categories = JSON.parse(localStorage.getItem('categories')) || [];
+        const checkboxes = categoryList.querySelectorAll('.cat-checkbox');
+        const anySelected = Array.from(checkboxes).some(cb => cb.checked);
+        deleteSelectedCategoriesBtn.style.display = (anySelected && categories.length > 0) ? 'inline-block' : 'none';
+    }
+
+    deleteSelectedCategoriesBtn.addEventListener('click', function() {
+        let categories = JSON.parse(localStorage.getItem('categories')) || [];
+        const checkboxes = categoryList.querySelectorAll('.cat-checkbox:checked');
+        if (checkboxes.length === 0) return;
+
+        const indices = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-index'))).sort((a,b)=>b-a);
+        indices.forEach(i => categories.splice(i,1));
+        saveCategories(categories);
+
+        let storedLinks = getLinks();
+        let changed = false;
+        storedLinks.forEach(link => {
+            const oldLen = link.categories.length;
+            link.categories = link.categories.filter(cat => categories.includes(cat));
+            if (link.categories.length !== oldLen) changed = true;
+        });
+        if (changed) {
+            saveLinksArray(storedLinks);
+            loadLinks();
+        }
+
+        alert('Selected categories deleted successfully!');
+        updateDeleteCategoriesBtn();
+    });
+
+    loadCategories();
+
+    // Link Management
+    const linkForm = document.getElementById('link-form');
+    const linksTableBody = document.querySelector('#links-table tbody');
+    const bulkAssignBtn = document.getElementById('assign-categories-btn');
+    const bulkRemoveCategoriesBtn = document.getElementById('remove-categories-btn');
+    const intelligentAssignmentBtn = document.getElementById('intelligent-assignment-btn');
+    const deleteSelectedLinksBtn = document.getElementById('delete-selected-links-btn');
+    const selectionOverlayLinks = document.getElementById('selection-overlay-links');
+
+    let editingIndex = null;
+    let lastClickedLinkIndex = null;
+    let isSelectingLinks = false;
+    let linkStartX, linkStartY;
+
+    function getLinks() {
+        return JSON.parse(localStorage.getItem('customLinks')) || [];
+    }
+
+    function saveLinksArray(links) {
+        localStorage.setItem('customLinks', JSON.stringify(links));
+    }
+
+    function loadLinks() {
+        const storedLinks = getLinks();
+        linksTableBody.innerHTML = '';
+
+        storedLinks.forEach((link, index) => {
+            const urlTitle = escapeHTML(link.url);
+            const textTitle = escapeHTML(link.text);
+            const categoriesTitle = escapeHTML(link.categories.join(' - '));
+
+            const tr = document.createElement('tr');
+            tr.classList.add('link-row');
+            tr.innerHTML = `
+                <td><input type="checkbox" class="select-link" data-index="${index}" /></td>
+                <td title="${urlTitle}"><a href="${escapeHTML(link.url)}" target="_blank">${escapeHTML(link.url)}</a></td>
+                <td title="${textTitle}">${escapeHTML(link.text)}</td>
+                <td title="${categoriesTitle}">${escapeHTML(link.categories.join(' - '))}</td>
+                <td><button class="action-btn edit-btn" data-index="${index}">Edit</button></td>
+                <td><button class="action-btn delete-btn" data-index="${index}">Delete</button></td>
+            `;
+            linksTableBody.appendChild(tr);
+        });
+
+        updateDeleteLinksBtn();
+    }
+
+    linkForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const url = document.getElementById('link-url').value.trim();
+        const text = document.getElementById('link-text').value.trim();
+        const selectedOptions = Array.from(linkCategoriesSelect.selectedOptions);
+        const categories = selectedOptions.map(option => option.value);
+
+        if (!url || !text || categories.length === 0) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        try {
+            new URL(url);
+        } catch (_) {
+            alert('Please enter a valid URL.');
+            return;
+        }
+
+        let storedLinks = getLinks();
+
+        if (editingIndex === null) {
+            if (storedLinks.some(link => link.url === url)) {
+                alert('A link with this URL already exists.');
+                return;
+            }
+
+            const newLink = { url, text, categories };
+            storedLinks.push(newLink);
+            saveLinksArray(storedLinks);
+
+            alert('Link added successfully!');
+        } else {
+            if (storedLinks.some((link, idx) => link.url === url && idx !== editingIndex)) {
+                alert('Another link with this URL already exists.');
+                return;
+            }
+
+            storedLinks[editingIndex] = { url, text, categories };
+            saveLinksArray(storedLinks);
+
+            editingIndex = null;
+            linkForm.querySelector('button[type="submit"]').textContent = 'Add Link';
+            alert('Link updated successfully!');
+        }
+
+        linkForm.reset();
+        loadLinks();
+    });
+
+    linksTableBody.addEventListener('click', function(e) {
+        let storedLinks = getLinks();
+
+        if (e.target.classList.contains('delete-btn')) {
+            const index = parseInt(e.target.getAttribute('data-index'));
+            if (confirm('Are you sure you want to delete this link?')) {
+                storedLinks.splice(index, 1);
+                saveLinksArray(storedLinks);
+                loadLinks();
+                alert('Link deleted successfully!');
+            }
+        }
+
+        if (e.target.classList.contains('edit-btn')) {
+            const index = parseInt(e.target.getAttribute('data-index'));
+            const link = storedLinks[index];
+            document.getElementById('link-url').value = link.url;
+            document.getElementById('link-text').value = link.text;
+
+            Array.from(linkCategoriesSelect.options).forEach(option => {
+                option.selected = link.categories.includes(option.value);
+            });
+
+            editingIndex = index;
+            linkForm.querySelector('button[type="submit"]').textContent = 'Update Link';
+        }
+
+        updateDeleteLinksBtn();
+    });
+
+    loadLinks();
+
+    // Bulk Category Assignment
+    bulkAssignBtn.addEventListener('click', function() {
+        const selectedCategories = Array.from(bulkCategoriesSelect.selectedOptions).map(option => option.value);
+        if (selectedCategories.length === 0) {
+            alert('Please select at least one category to assign.');
+            return;
+        }
+
+        const selectedLinksCheckboxes = document.querySelectorAll('.select-link:checked');
+        if (selectedLinksCheckboxes.length === 0) {
+            alert('Please select at least one link to assign categories.');
+            return;
+        }
+
+        let storedLinks = getLinks();
+        const selectedIndices = Array.from(selectedLinksCheckboxes).map(cb => parseInt(cb.getAttribute('data-index')));
+
+        selectedIndices.forEach(index => {
+            const link = storedLinks[index];
+            link.categories = Array.from(new Set([...link.categories, ...selectedCategories]));
+        });
+
+        saveLinksArray(storedLinks);
+        loadLinks();
+        alert('Categories assigned to selected links successfully!');
+    });
+
+    // Bulk Category Removal
+    bulkRemoveCategoriesBtn.addEventListener('click', function() {
+        const removeCategories = Array.from(removeCategoriesSelect.selectedOptions).map(option => option.value);
+        if (removeCategories.length === 0) {
+            alert('Please select at least one category to remove.');
+            return;
+        }
+
+        const selectedLinksCheckboxes = document.querySelectorAll('.select-link:checked');
+        if (selectedLinksCheckboxes.length === 0) {
+            alert('Please select at least one link to remove categories from.');
+            return;
+        }
+
+        let storedLinks = getLinks();
+        const selectedIndices = Array.from(selectedLinksCheckboxes).map(cb => parseInt(cb.getAttribute('data-index')));
+
+        let changed = false;
+        selectedIndices.forEach(index => {
+            const link = storedLinks[index];
+            const oldLen = link.categories.length;
+            link.categories = link.categories.filter(cat => !removeCategories.includes(cat));
+            if (link.categories.length !== oldLen) changed = true;
+        });
+
+        if (changed) {
+            saveLinksArray(storedLinks);
+            loadLinks();
+            alert('Selected categories removed from the selected links successfully!');
+        } else {
+            alert('No categories were removed. Maybe the selected links did not have the chosen categories.');
+        }
+    });
+
+    // Select All Checkbox for links
+    const selectAllCheckboxForLinks = document.getElementById('select-all');
+    selectAllCheckboxForLinks.addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.select-link');
+        checkboxes.forEach(cb => {
+            cb.checked = selectAllCheckboxForLinks.checked;
+        });
+        updateDeleteLinksBtn();
+    });
+
+    // Utility Function to Escape HTML
+
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;");
+    }
+
+    // Example: Adding a New Category
+    categoryForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newCategoryInput = document.getElementById('new-category');
+        const newCategory = escapeHTML(newCategoryInput.value.trim());
+
+        if (!newCategory) {
+            alert('Please enter a category name.');
+            return;
+        }
+
+        let categories = JSON.parse(localStorage.getItem('categories')) || [];
+
+        if (categories.includes(newCategory)) {
+            alert('Category already exists.');
+            return;
+        }
+
+        categories.push(newCategory);
+        saveCategories(categories);
+        newCategoryInput.value = '';
+        alert('Category added successfully!');
+    });
+
+    function getCategories() {
+        const categories = JSON.parse(localStorage.getItem('categories'));
+        return Array.isArray(categories) ? categories : [];
+    }
+
+    function getLinks() {
+        const links = JSON.parse(localStorage.getItem('customLinks'));
+        return Array.isArray(links) ? links : [];
+    }
+
+    function saveCategories(categories) {
+        const backup = localStorage.getItem('categoriesBackup') || '[]';
+        localStorage.setItem('categoriesBackup', backup);
+        localStorage.setItem('categories', JSON.stringify(categories));
+    }
+
+    function saveLinksArray(links) {
+        const backup = localStorage.getItem('customLinksBackup') || '[]';
+        localStorage.setItem('customLinksBackup', backup);
+        localStorage.setItem('customLinks', JSON.stringify(links));
+    }
+
+    // Delete Selected Links Button
+    function updateDeleteLinksBtn() {
+        const checkboxes = document.querySelectorAll('.select-link');
+        const anySelected = Array.from(checkboxes).some(cb => cb.checked);
+        deleteSelectedLinksBtn.style.display = anySelected ? 'inline-block' : 'none';
+    }
+
+    deleteSelectedLinksBtn.addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.select-link:checked');
+        if (checkboxes.length === 0) return;
+        if (!confirm('Are you sure you want to delete the selected links?')) return;
+
+        let storedLinks = getLinks();
+        const indices = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-index'))).sort((a,b)=>b-a);
+        indices.forEach(i => storedLinks.splice(i,1));
+        saveLinksArray(storedLinks);
+        loadLinks();
+        alert('Selected links deleted successfully!');
+        updateDeleteLinksBtn();
+    });
+
+    // Shift/Ctrl selection for links
+    linksTableBody.addEventListener('click', function(e) {
+        if (e.target.classList.contains('select-link')) {
+            const checkboxes = linksTableBody.querySelectorAll('.select-link');
+            const clickedIndex = parseInt(e.target.getAttribute('data-index'));
+
+            if (e.shiftKey && lastClickedLinkIndex !== null) {
+                const start = Math.min(lastClickedLinkIndex, clickedIndex);
+                const end = Math.max(lastClickedLinkIndex, clickedIndex);
+                for (let i = start; i <= end; i++) {
+                    checkboxes[i].checked = true;
+                }
+            }
+
+            lastClickedLinkIndex = clickedIndex;
+            updateDeleteLinksBtn();
+        }
+    });
+
+    // Drag selection for links
+    const linkManagementSection = document.getElementById('link-management');
+    linkManagementSection.addEventListener('mousedown', function(e) {
+        if (e.target.classList.contains('select-link') || e.target.classList.contains('edit-btn') || e.target.classList.contains('delete-btn') || e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'select' || e.target.tagName.toLowerCase() === 'input') {
+            return;
+        }
+
+        const tableRect = linksTableBody.getBoundingClientRect();
+        if (e.clientY < tableRect.top || e.clientY > tableRect.bottom) return;
+
+        isSelectingLinks = true;
+        linkStartX = e.clientX;
+        linkStartY = e.clientY;
+        selectionOverlayLinks.style.display = 'block';
+        selectionOverlayLinks.style.left = linkStartX + 'px';
+        selectionOverlayLinks.style.top = linkStartY + 'px';
+        selectionOverlayLinks.style.width = '0px';
+        selectionOverlayLinks.style.height = '0px';
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (isSelectingLinks) {
+            const x = Math.min(e.clientX, linkStartX);
+            const y = Math.min(e.clientY, linkStartY);
+            const w = Math.abs(e.clientX - linkStartX);
+            const h = Math.abs(e.clientY - linkStartY);
+            selectionOverlayLinks.style.left = x + 'px';
+            selectionOverlayLinks.style.top = y + 'px';
+            selectionOverlayLinks.style.width = w + 'px';
+            selectionOverlayLinks.style.height = h + 'px';
+
+            const rect = selectionOverlayLinks.getBoundingClientRect();
+            const rows = linksTableBody.querySelectorAll('.link-row');
+            rows.forEach(row => {
+                const rowRect = row.getBoundingClientRect();
+                const inside = !(rowRect.right < rect.left || rowRect.left > rect.right || rowRect.bottom < rect.top || rowRect.top > rect.bottom);
+                row.classList.toggle('selected', inside);
+            });
+        }
+    });
+
+    document.addEventListener('mouseup', function(e) {
+        if (isSelectingLinks) {
+            isSelectingLinks = false;
+            selectionOverlayLinks.style.display = 'none';
+
+            const rows = linksTableBody.querySelectorAll('.link-row');
+            rows.forEach(row => {
+                const checkbox = row.querySelector('.select-link');
+                if (row.classList.contains('selected')) {
+                    checkbox.checked = true;
+                    row.classList.remove('selected');
+                }
+            });
+            updateDeleteLinksBtn();
+        }
+    });
+
+    // Intelligent Category Assignment
+    intelligentAssignmentBtn.addEventListener('click', function() {
+        let categories = JSON.parse(localStorage.getItem('categories')) || [];
+        let storedLinks = getLinks();
+
+        if (categories.length === 0) {
+            alert('No categories found. Please add categories first.');
+            return;
+        }
+
+        if (storedLinks.length === 0) {
+            alert('No links found. Please add links first.');
+            return;
+        }
+
+        let changesMade = false;
+        const THRESHOLD = 7;
+
+        // Define stop words
+        const stopWords = new Set([
+            'the', 'and', 'to', 'of', 'a', 'in', 'is', 'it', 'you', 'that',
+            'he', 'was', 'for', 'on', 'are', 'as', 'with', 'his', 'they',
+            'i', 'at', 'be', 'this', 'have', 'from', 'or', 'one', 'had',
+            'by', 'word', 'but', 'not', 'what', 'all', 'were', 'we', 'when',
+            'your', 'can', 'said', 'there', 'use', 'an', 'each', 'which',
+            'she', 'do', 'how', 'their', 'if'
+        ]);
+
+        // PHASE 1: Direct substring assignment
+        let substringAssigned = new Array(storedLinks.length).fill(false);
+
+        categories.forEach(cat => {
+            const catLower = cat.toLowerCase();
+            storedLinks.forEach((link, i) => {
+                const linkTextLower = link.text.toLowerCase();
+                if (linkTextLower.includes(catLower)) {
+                    if (!link.categories.includes(cat)) {
+                        link.categories.push(cat);
+                        substringAssigned[i] = true;
+                        changesMade = true;
+                    }
+                }
+            });
+        });
+
+        // Build word-to-category frequency map excluding stop words
+        const wordCatCount = {};
+        storedLinks.forEach(link => {
+            if (link.categories.length > 0) {
+                // Tokenize the text into words, removing punctuation
+                const words = link.text.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
+                link.categories.forEach(cat => {
+                    words.forEach(w => {
+                        if (stopWords.has(w)) return; // Skip stop words
+                        if (!wordCatCount[w]) {
+                            wordCatCount[w] = {};
+                        }
+                        if (!wordCatCount[w][cat]) {
+                            wordCatCount[w][cat] = 0;
+                        }
+                        wordCatCount[w][cat]++;
+                    });
+                });
+            }
+        });
+
+        // PHASE 2: Learned pattern assignment for links that did not get categories from substring
+        storedLinks.forEach((link, i) => {
+            if (link.categories.length === 0 && !substringAssigned[i]) {
+                const words = link.text.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
+                const potentialCategories = new Set();
+
+                words.forEach(w => {
+                    if (wordCatCount[w]) {
+                        for (let cat in wordCatCount[w]) {
+                            if (wordCatCount[w][cat] >= THRESHOLD) {
+                                potentialCategories.add(cat);
+                            }
+                        }
+                    }
+                });
+
+                // Assign only the most relevant category (e.g., the one with the highest frequency)
+                if (potentialCategories.size > 0) {
+                    let bestCategory = null;
+                    let maxCount = 0;
+                    potentialCategories.forEach(cat => {
+                        // Find the word in the link that contributes most to this category
+                        let count = 0;
+                        words.forEach(w => {
+                            if (wordCatCount[w] && wordCatCount[w][cat]) {
+                                count += wordCatCount[w][cat];
+                            }
+                        });
+                        if (count > maxCount) {
+                            maxCount = count;
+                            bestCategory = cat;
+                        }
+                    });
+
+                    if (bestCategory && !link.categories.includes(bestCategory)) {
+                        link.categories.push(bestCategory);
+                        changesMade = true;
+                    }
+                }
+            }
+        });
+
+        if (changesMade) {
+            saveLinksArray(storedLinks);
+            loadLinks();
+            alert('Intelligent category assignment completed. Categories have been updated where patterns were found.\n(At least 7 instances of a word→category match were required.)');
+        } else {
+            alert('No new assignments made. Either no substring matches or no pattern with at least 7 instances was found.');
+        }
+    });
+
+    function initializeLinkCategories() {
+        const categories = JSON.parse(localStorage.getItem('categories')) || [];
+        linkCategoriesSelect.innerHTML = '';
+        bulkCategoriesSelect.innerHTML = '';
+        removeCategoriesSelect.innerHTML = '';
+
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            linkCategoriesSelect.appendChild(option);
+
+            const bulkOption = document.createElement('option');
+            bulkOption.value = category;
+            bulkOption.textContent = category;
+            bulkCategoriesSelect.appendChild(bulkOption);
+
+            const removeOption = document.createElement('option');
+            removeOption.value = category;
+            removeOption.textContent = category;
+            removeCategoriesSelect.appendChild(removeOption);
+        });
+    }
+
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'categories') {
+            initializeLinkCategories();
+        }
+        if (e.key === 'theme') {
+            loadTheme();
+        }
+        if (e.key === 'customLinks') {
+            loadLinks();
+        }
+    });
+
+    // Batch Link Addition
+    const batchLinkForm = document.getElementById('batch-link-form');
+    batchLinkForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const batchLinksInput = document.getElementById('batch-links').value.trim();
+        if (!batchLinksInput) {
+            alert('Please paste your links in the textarea.');
+            return;
+        }
+
+        const lines = batchLinksInput.split('\n').filter(line => line.trim() !== '');
+        const newLinks = [];
+        const errors = [];
+
+        lines.forEach((line, index) => {
+            const parts = line.split(',');
+
+            if (parts.length < 2) {
+                errors.push(`Line ${index + 1}: Not enough fields. Expected format: URL, Display Text`);
+                return;
+            }
+
+            const url = parts[0].trim();
+            const text = parts[1].trim();
+
+            if (!url || !text) {
+                errors.push(`Line ${index + 1}: Missing URL or Display Text.`);
+                return;
+            }
+
+            try {
+                new URL(url);
+            } catch (_) {
+                errors.push(`Line ${index + 1}: Invalid URL.`);
+                return;
+            }
+
+            newLinks.push({ url, text, categories: [] });
+        });
+
+        if (errors.length > 0) {
+            alert('Errors encountered:\n' + errors.join('\n'));
+            return;
+        }
+
+        let storedLinks = getLinks();
+
+        newLinks.forEach(link => {
+            if (!storedLinks.some(existingLink => existingLink.url === link.url)) {
+                storedLinks.push(link);
+            }
+        });
+
+        saveLinksArray(storedLinks);
+        loadLinks();
+        batchLinkForm.reset();
+        alert('Batch links added successfully! Please assign categories to the new links.');
+    });
+
+    function initialSetup() {
+        loadCategories();
+        initializeLinkCategories();
+        loadLinks();
+    }
+
+    initialSetup();
+
+    // Resizable Columns
+    const thElements = document.querySelectorAll('#links-table th');
+    thElements.forEach(th => {
+        const resizer = th.querySelector('.resizer');
+        if (!resizer) return;
+
+        let startX, startWidth;
+
+        resizer.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            startX = e.pageX;
+            startWidth = th.offsetWidth;
+
+            document.addEventListener('mousemove', mouseMove);
+            document.addEventListener('mouseup', mouseUp);
+        });
+
+        function mouseMove(e) {
+            const dx = e.pageX - startX;
+            const newWidth = startWidth + dx;
+            if (newWidth > 50) { // Minimum column width
+                th.style.width = newWidth + 'px';
+            }
+        }
+
+        function mouseUp(e) {
+            document.removeEventListener('mousemove', mouseMove);
+            document.removeEventListener('mouseup', mouseUp);
+        }
+    });
+
+    // Example: Restore Categories
+    function restoreCategories() {
+        const backup = JSON.parse(localStorage.getItem('categoriesBackup'));
+        if (backup && Array.isArray(backup)) {
+            localStorage.setItem('categories', JSON.stringify(backup));
+            alert('Categories restored from backup.');
+            displayCategoryBar();
+            displayCategoriesWithLinks();
+        } else {
+            alert('No backup available.');
+        }
+    }
+
+    // Similarly, implement restoreLinks()
+
+    // ===========================
+    // Backup & Restore Functionality
+    // ===========================
+
+    // Select Export and Import buttons
+    const exportBtn = document.getElementById('export-btn');
+    const importBtn = document.getElementById('import-btn');
+    const importFileInput = document.getElementById('import-file-input');
+
+    // Export Function
+    exportBtn.addEventListener('click', function() {
+        // Gather all data from localStorage
+        const data = {
+            theme: localStorage.getItem('theme') || 'default',
+            templateSettings: JSON.parse(localStorage.getItem('templateSettings')) || { categoryPosition: 'horizontal' },
+            categories: JSON.parse(localStorage.getItem('categories')) || [],
+            customLinks: JSON.parse(localStorage.getItem('customLinks')) || []
+        };
+
+        // Convert data to JSON string
+        const jsonData = JSON.stringify(data, null, 4);
+
+        // Create a Blob from the JSON string
+        const blob = new Blob([jsonData], { type: 'application/json' });
+
+        // Create a download link
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const currentDate = new Date().toISOString().split('T')[0];
+        a.download = `backup-${currentDate}.json`;
+        document.body.appendChild(a);
+        a.click();
+
+        // Clean up
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+    // Import Function
+    importBtn.addEventListener('click', function() {
+        // Trigger the hidden file input
+        importFileInput.click();
+    });
+
+    // Handle File Selection
+    importFileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (!file) {
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+
+                // Validate the imported data
+                if (!importedData || typeof importedData !== 'object') {
+                    throw new Error('Invalid data format.');
+                }
+
+                const { theme, templateSettings, categories, customLinks } = importedData;
+
+                // Basic validation
+                if (
+                    (theme !== 'dark' && theme !== 'default') ||
+                    !templateSettings ||
+                    !Array.isArray(categories) ||
+                    !Array.isArray(customLinks)
+                ) {
+                    throw new Error('Missing or invalid data fields.');
+                }
+
+                // Confirm with the user before overwriting data
+                if (!confirm('Importing data will overwrite your current settings, categories, and links. Do you want to continue?')) {
+                    return;
+                }
+
+                // Overwrite localStorage data
+                localStorage.setItem('theme', theme);
+                localStorage.setItem('templateSettings', JSON.stringify(templateSettings));
+                localStorage.setItem('categories', JSON.stringify(categories));
+                localStorage.setItem('customLinks', JSON.stringify(customLinks));
+
+                // Reload the UI to reflect imported data
+                loadTheme();
+                loadSettings();
+                loadCategories();
+                loadLinks();
+
+                alert('Data imported successfully!');
+            } catch (error) {
+                alert('Failed to import data: ' + error.message);
+            }
+        };
+
+        reader.onerror = function() {
+            alert('Failed to read the file.');
+        };
+
+        reader.readAsText(file);
+
+        // Reset the file input
+        importFileInput.value = '';
+    });
+
+    // ===========================
+    // Existing JavaScript code continues...
+    // ===========================
+
+</script>
+</body>
+</html>
